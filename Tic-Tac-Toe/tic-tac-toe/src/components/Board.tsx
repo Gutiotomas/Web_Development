@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { Square } from "./Square.tsx";
+//import { Square } from "./Square.tsx";
 import { BoardCells } from "../types";
 
 export const Board: React.FC = () => {
@@ -12,37 +12,16 @@ export const Board: React.FC = () => {
     setXIsNext(!xIsNext);
   };
 
+  const title = <h1>The next player is {xIsNext ? "X" : "O"}</h1>;
+  const showTitle = true;
   return (
     <>
-      <h1>The next player is {xIsNext ? "X" : "O"}</h1>
+      {showTitle && title}
       <div className="board">
-        <div className="square" onClick={() => handleClick(0)}>
-          {squares[0]}
-        </div>
-        <div className="square" onClick={() => handleClick(1)}>
-          {squares[1]}
-        </div>
-        <div className="square" onClick={() => handleClick(2)}>
-          {squares[2]}
-        </div>
-        <div className="square" onClick={() => handleClick(3)}>
-          {squares[3]}
-        </div>
-        <div className="square" onClick={() => handleClick(4)}>
-          {squares[4]}
-        </div>
-        <div className="square" onClick={() => handleClick(5)}>
-          {squares[5]}
-        </div>
-        <div className="square" onClick={() => handleClick(6)}>
-          {squares[6]}
-        </div>
-        <div className="square" onClick={() => handleClick(7)}>
-          {squares[7]}
-        </div>
-        <div className="square" onClick={() => handleClick(8)}>
-          {squares[8]}
-        </div>
+        {
+            squares.map((value,i)=>
+                <div key={i} className="square" onClick={() => handleClick(i)}>{value}</div>)
+        }
       </div>
     </>
   );
