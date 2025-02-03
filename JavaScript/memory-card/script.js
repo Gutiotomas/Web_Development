@@ -53,7 +53,6 @@ const movesCounter = () => {
   moves.innerHTML = `<span>Pasos:</span>${movesCount}`;
 };
 
-//YOUR CODE STARTS HERE
 //Function to choose four random cards
 const generateRandom = (size = 4) => {
   //temporary array
@@ -73,26 +72,19 @@ const generateRandom = (size = 4) => {
 };
 
 // Function to generate matrix for the game
-
 const matrixGenerator = (cardValues, size = 4) => {
   gameContainer.innerHTML = "";
   cardValues = [...cardValues, ...cardValues];
-  //simple shuffle, DO IT YOURSELF
-  //Your code here
+  //simple shuffle
+  cardValues.sort(() => Math.random() - 0.5);
   for (let i = 0; i < size * size; i++) {
-    /*
-        Create Cards
-        before => front side (contains question mark)
-        after => back side (contains actual image);
-        data-card-values is a custom attribute which stores the names of the cards to match later
-      */
     gameContainer.innerHTML += `
-     <div class="card-container" data-card-value="${cardValues[i].name}">
-        <div class="card-before">?</div>
-        <div class="card-after">
-        <img src="${cardValues[i].image}" class="image"/></div>
-     </div>
-     `;
+         <div class="card-container" data-card-value="${cardValues[i].name}">
+                <div class="card-before">?</div>
+                <div class="card-after">
+                <img src="${cardValues[i].image}" class="image"/></div>
+         </div>
+         `;
   }
   //Grid
   gameContainer.style.gridTemplateColumns = `repeat(${size},auto)`;
@@ -101,26 +93,37 @@ const matrixGenerator = (cardValues, size = 4) => {
   cards = document.querySelectorAll(".card-container");
   cards.forEach((card) => {
     card.addEventListener("click", () => {
-      card.classList.add("flipped");
-      movesCounter();
-
-      //Your code starts here... This is the hard part of this code
-
-      //Logic Needed:
-      //1. We need to check if the first card is not already matched. We can do that with the class "matched"
-      //2. flip the card. If there are no first ones, asign that card as first card and get the value of the card
-      //HINT: The value is on the attribute data-card-value
-
-      //3 If there is a first card flipped, it should flipped the second card after anohter click and ALSO move the counter
-      //4. If two cards are flipped, code should compare their value
-      //4.1 If both cards have the same value, they're a match so the code should assign one winCount
-      //HINT: A card is match if it has the class matched
-      //HINT # 2: User wins if and only if It matches all the cards, how can you check that using the cardValues array?
-      //HINT # 3: If user wins, game must stop. Don't worry, you already have a named function for that below ;) ;)
-
-      //If the cards don't match, you should flipped them again. Do you see the class flipped ? Well after this you can't see it (like JOHN CEEENAAAA)
-
-      //Note: It would be nice if the flipped process would be 'delayed'
+      if (!card.classList.contains("matched")) {
+        card.classList.add("flipped");
+        if (!firstCard) {
+          firstCard = card;
+        } else {
+          secondCard = card;
+          movesCounter();
+          if (
+            firstCard.getAttribute("data-card-value") ===
+            secondCard.getAttribute("data-card-value")
+          ) {
+            firstCard.classList.add("matched");
+            secondCard.classList.add("matched");
+            firstCard = null;
+            secondCard = null;
+            winCount += 1;
+            if (winCount === Math.floor(cardValues.length / 2)) {
+              result.innerHTML = `<h2>Ganaste!</h2><h4>Pasos: ${movesCount}</h4>`;
+              stopGame();
+            }
+          } else {
+            let [tempFirst, tempSecond] = [firstCard, secondCard];
+            firstCard = null;
+            secondCard = null;
+            setTimeout(() => {
+              tempFirst.classList.remove("flipped");
+              tempSecond.classList.remove("flipped");
+            }, 900);
+          }
+        }
+      }
     });
   });
 };
@@ -134,9 +137,8 @@ startButton.addEventListener("click", () => {
   controls.classList.add("hide");
   stopButton.classList.remove("hide");
   startButton.classList.add("hide");
-  //Function to to start the timer. Again, check setInterval
-  //Hint: You already have a function that checks the time each second, use it wisely
-  //YOUR CODE HERE
+
+  interval = setInterval(timeGenerator, 1000);
   moves.innerHTML = `<span>Pasos:</span> ${movesCount}`;
   initializer();
 });
@@ -148,8 +150,7 @@ stopButton.addEventListener(
     controls.classList.remove("hide");
     stopButton.classList.add("hide");
     startButton.classList.remove("hide");
-    // timer created with setInterVal needs to be cleared
-    //YOUR CODE HERE
+    clearInterval(interval);
   })
 );
 
